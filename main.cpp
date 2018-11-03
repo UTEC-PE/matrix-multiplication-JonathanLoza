@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#define NUM_THREADS 2
+#define NUM_THREADS 3
 
 int numerothreads(int &filasporthread, int &restante,int  n);
 void rellenar(int** matriz1,int**matriz2 ,int** respuesta, int fila, int cantidad, int c);
@@ -14,8 +14,8 @@ void rellenarMatriz(int filas, int columnas, int** matriz) ;
 
 int main(){
 
-  int rows=2;
-  int cols=2;
+  int rows=3;
+  int cols=3;
   int** matriz1 = new int*[rows];
   for (int i = 0; i < rows; ++i)
         matriz1[i] = new int[cols];
@@ -26,26 +26,29 @@ int main(){
   rellenarMatriz(rows, cols, matriz1);
   rellenarMatriz(rows, cols, matriz2);
 
-  int **resultado = new int*[2];
-  for(int i=0;i<2;i++){
-      resultado[i] = new int[2];
+  int **resultado = new int*[rows];
+  for(int i=0;i<rows;i++){
+      resultado[i] = new int[cols];
   }
   int nrows=0;
   int diferencia=0;
-  int nthreads=numerothreads(nrows,diferencia,2);
+  int nthreads=numerothreads(nrows,diferencia,cols);
   //cout<<nthreads<<endl;
   //cout<<nrows<<endl;
   //cout<<diferencia<<endl;
   thread threads[nthreads];
   int primerafila=0;
+  int ultimafila=nrows;
   for (int i = 0; i < nthreads; ++i) {
     if(diferencia!=0){
-      threads[i] = thread(rellenar, matriz1,matriz2, resultado, primerafila,nrows+1,cols);
+      threads[i] = thread(rellenar, matriz1,matriz2, resultado, primerafila,ultimafila+1,cols);
       primerafila=+nrows+1;
+      ultimafila+=nrows+1;
       diferencia--;
     }else{
-      threads[i] = thread(rellenar, matriz1,matriz2, resultado, primerafila,nrows,cols );
+      threads[i] = thread(rellenar, matriz1,matriz2, resultado, primerafila,ultimafila,cols );
       primerafila=+nrows;
+      ultimafila+=nrows;
     }
   }
 
@@ -53,8 +56,8 @@ int main(){
       threads[i].join();
   }
 
-  for(int i=0;i<2;i++){
-    for(int j=0; j<2; j++){
+  for(int i=0;i<rows;i++){
+    for(int j=0; j<cols; j++){
       cout<<resultado[i][j]<<" ";
     }
     cout<<endl;
@@ -77,7 +80,7 @@ int numerothreads(int &filasporthread, int &restante,int  n){
 };
 
 void rellenar(int** matriz1,int**matriz2 ,int** respuesta, int fila, int cantidad, int c){
-  for (int i = fila; i <= cantidad; ++i) {
+  for (int i = fila; i < cantidad; ++i) {
     for (int j = 0; j < c; ++j) {
       int result = 0;
       for (int k = 0; k < c; ++k) {
